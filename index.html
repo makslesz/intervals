@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Training</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Training">
+<meta name="theme-color" content="#f2f2f7">
+<style>
+:root{--bg:#f2f2f7;--card:#fff;--tx:#1c1c1e;--tx2:#8e8e93;--sep:#e5e5ea;--blue:#0a84ff;--green:#30d158;--red:#ff453a;--fill:#e9e9ee}
+@media (prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--tx:#fff;--tx2:#98989f;--sep:#38383a;--blue:#0a84ff;--fill:#2c2c2e}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{font:16px/1.35 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--tx);padding:env(safe-area-inset-top) 0 calc(84px + env(safe-area-inset-bottom))}
+main{max-width:640px;margin:0 auto;padding:0 16px}
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 4px 10px}
+h1{font-size:32px;font-weight:700;letter-spacing:-.02em;margin:0}
+h2{font-size:20px;font-weight:600;margin:24px 4px 10px;letter-spacing:-.01em}
+button{font:inherit;color:var(--blue);background:none;border:0;padding:6px;cursor:pointer}
+.card{background:var(--card);border-radius:18px;padding:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.m{background:var(--card);border-radius:18px;padding:12px 12px 8px;min-height:92px}
+.m small{color:var(--tx2);font-size:12px;display:block}
+.m b{font-size:24px;font-weight:700;letter-spacing:-.02em}
+.m i{font-style:normal;font-size:12px;color:var(--tx2);margin-left:2px}
+.m svg{display:block;width:100%;height:22px;margin-top:4px}
+.cal-h{display:flex;align-items:center;justify-content:space-between;margin:0 0 8px}
+.cal-h strong{font-size:17px}
+.dow,.days{display:grid;grid-template-columns:repeat(7,1fr);text-align:center}
+.dow span{font-size:11px;color:var(--tx2);padding:4px 0}
+.d{height:50px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:5px;border-radius:12px;cursor:pointer;font-size:15px}
+.d.o{color:var(--tx2);opacity:.45}
+.d .n{width:28px;height:28px;line-height:28px;border-radius:50%}
+.d.t .n{background:var(--red);color:#fff;font-weight:600}
+.d.s{background:var(--fill)}
+.dots{display:flex;gap:3px;height:6px;margin-top:2px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.dot.p{background:none;border:1.5px solid var(--blue)}
+.row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--sep)}
+.row:first-child{border-top:0}
+.row span{color:var(--tx2);font-size:14px;white-space:nowrap}
+.row em{font-style:normal;color:var(--blue);font-size:12px;display:block}
+.empty{color:var(--tx2);text-align:center;padding:10px}
+#msgs{display:flex;flex-direction:column;gap:8px}
+.b{max-width:85%;padding:9px 13px;border-radius:18px;white-space:pre-wrap;word-wrap:break-word}
+.b.u{align-self:flex-end;background:var(--blue);color:#fff}
+.b.a{align-self:flex-start;background:var(--card)}
+#bar{position:fixed;left:0;right:0;bottom:0;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--bg) 80%,transparent);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-top:1px solid var(--sep)}
+#bar div{max-width:640px;margin:0 auto;display:flex;gap:8px}
+#q{flex:1;font:inherit;font-size:16px;border:0;border-radius:20px;padding:10px 16px;background:var(--card);color:var(--tx);outline:none}
+#go{background:var(--blue);color:#fff;border-radius:50%;width:40px;height:40px;padding:0;font-size:18px}
+dialog{border:0;border-radius:20px;background:var(--card);color:var(--tx);width:min(92vw,420px);padding:20px}
+dialog::backdrop{background:rgba(0,0,0,.4)}
+dialog h3{margin:0 0 12px}
+dialog label{display:block;font-size:13px;color:var(--tx2);margin:12px 0 4px}
+dialog input{width:100%;font:inherit;font-size:16px;padding:10px;border-radius:10px;border:1px solid var(--sep);background:var(--bg);color:var(--tx)}
+dialog p{font-size:12px;color:var(--tx2)}
+.err{color:var(--red);text-align:center;padding:8px;font-size:14px}
+</style>
+</head>
+<body>
+<main>
+<header><h1>Training</h1><button id="gear" aria-label="Settings">Settings</button></header>
+<div id="err"></div>
+<div class="grid" id="well"></div>
+<h2>Calendar</h2>
+<div class="card">
+  <div class="cal-h"><button id="prev" aria-label="Previous month">‹</button><strong id="mt"></strong><button id="next" aria-label="Next month">›</button></div>
+  <div class="dow"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+  <div class="days" id="days"></div>
+</div>
+<div class="card" id="detail" style="margin-top:10px"></div>
+<h2>Ask Claude</h2>
+<div id="msgs"><div class="empty" id="hint">Ask about your training, recovery or what to do next.</div></div>
+</main>
+<div id="bar"><div><input id="q" placeholder="Ask about your training" enterkeyhint="send" autocomplete="off"><button id="go" aria-label="Send">↑</button></div></div>
+
+<dialog id="dlg">
+  <h3>Settings</h3>
+  <label>Intervals.icu API key</label><input id="ik" type="password" autocomplete="off">
+  <label>Claude API key</label><input id="ck" type="password" autocomplete="off">
+  <p>Keys are stored only in this browser on your device. Intervals.icu: Settings → Developer Settings. Claude: console.anthropic.com.</p>
+  <div style="display:flex;justify-content:space-between"><button id="clr" style="color:var(--red)">Clear keys</button><button id="save"><b>Save</b></button></div>
+</dialog>
+
+<script>
+const MODEL='claude-sonnet-5-5';
+const $=id=>document.getElementById(id);
+const ls={g:k=>{try{return localStorage.getItem(k)||''}catch(e){return ''}},s:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},d:k=>{try{localStorage.removeItem(k)}catch(e){}}};
+let ik=ls.g('ik'),ck=ls.g('ck'),wellness=[],cache={},view=new Date(),sel=iso(new Date()),hist=[];
+view.setDate(1);
+function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function dur(s){if(!s)return'';const h=Math.floor(s/3600),m=Math.round(s%3600/60);return h?h+'h '+m+'m':m+'m'}
+function esc(t){return String(t).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+async function api(p){const r=await fetch('https://intervals.icu/api/v1/athlete/0'+p,{headers:{Authorization:'Basic '+btoa('API_KEY:'+ik)}});if(!r.ok)throw new Error('Intervals.icu returned '+r.status);return r.json()}
+function spark(v,c){v=v.filter(x=>x!=null);if(v.length<2)return'';const mn=Math.min(...v),mx=Math.max(...v),r=mx-mn||1;const p=v.map((x,i)=>(i/(v.length-1)*100).toFixed(1)+','+(20-(x-mn)/r*18).toFixed(1)).join(' ');return`<svg viewBox="0 0 100 22" preserveAspectRatio="none"><polyline points="${p}" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`}
+function renderWell(){
+  const last=k=>{for(let i=wellness.length-1;i>=0;i--)if(wellness[i][k]!=null)return wellness[i][k]};
+  const ser=k=>wellness.map(w=>w[k]);
+  const ctl=last('ctl'),atl=last('atl'),form=ctl!=null&&atl!=null?Math.round(ctl-atl):null;
+  const items=[
+    ['HRV',last('hrv')!=null?Math.round(last('hrv')):'–','ms',ser('hrv'),'#30d158'],
+    ['Resting HR',last('restingHR')??'–','bpm',ser('restingHR'),'#ff453a'],
+    ['Sleep',last('sleepSecs')?dur(last('sleepSecs')):'–','',ser('sleepSecs'),'#bf5af2'],
+    ['Fitness',ctl!=null?Math.round(ctl):'–','CTL',ser('ctl'),'#0a84ff'],
+    ['Fatigue',atl!=null?Math.round(atl):'–','ATL',ser('atl'),'#ff9f0a'],
+    ['Form',form??'–','TSB',wellness.map(w=>w.ctl!=null&&w.atl!=null?w.ctl-w.atl:null),'#64d2ff']];
+  $('well').innerHTML=items.map(i=>`<div class="m"><small>${i[0]}</small><b>${i[1]}</b><i>${i[2]}</i>${spark(i[3],i[4])}</div>`).join('');
+}
+function grid(){const f=new Date(view),o=(f.getDay()+6)%7;const s=new Date(f);s.setDate(1-o);const e=new Date(s);e.setDate(s.getDate()+41);return[s,e]}
+async function loadMonth(){
+  const [s,e]=grid(),key=iso(view);
+  if(!cache[key]){const q=`?oldest=${iso(s)}&newest=${iso(e)}`;
+    const [a,ev]=await Promise.all([api('/activities'+q),api('/events'+q+'&category=WORKOUT')]);
+    cache[key]={a,ev};}
+  renderCal();
+}
+function items(date){
+  const out=[];
+  for(const k in cache){for(const a of cache[k].a)if((a.start_date_local||'').slice(0,10)===date&&!out.some(o=>o.id==='a'+a.id))out.push({id:'a'+a.id,done:1,name:a.name,type:a.type,t:a.moving_time,dist:a.distance,load:a.icu_training_load});
+    for(const a of cache[k].ev)if((a.start_date_local||'').slice(0,10)===date&&!out.some(o=>o.id==='e'+a.id))out.push({id:'e'+a.id,done:0,name:a.name,type:a.type,t:a.moving_time,load:a.icu_training_load});}
+  return out;
+}
+function renderCal(){
+  $('mt').textContent=view.toLocaleDateString(undefined,{month:'long',year:'numeric'});
+  const [s]=grid(),today=iso(new Date());let h='';
+  for(let i=0;i<42;i++){const d=new Date(s);d.setDate(s.getDate()+i);const k=iso(d),it=items(k);
+    h+=`<div class="d${d.getMonth()!==view.getMonth()?' o':''}${k===today?' t':''}${k===sel?' s':''}" data-d="${k}"><span class="n">${d.getDate()}</span><div class="dots">${it.slice(0,3).map(x=>`<i class="dot${x.done?'':' p'}"></i>`).join('')}</div></div>`;}
+  $('days').innerHTML=h;
+  const it=items(sel),dt=new Date(sel+'T12:00');
+  $('detail').innerHTML=`<div style="font-weight:600;margin-bottom:4px">${dt.toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'})}</div>`+
+    (it.length?it.map(x=>`<div class="row"><div>${esc(x.name||x.type||'Workout')}<em>${x.done?'':'Planned'}</em></div><span>${[x.type,dur(x.t),x.dist?(x.dist/1000).toFixed(1)+' km':'',x.load?Math.round(x.load)+' TSS':''].filter(Boolean).join(' · ')}</span></div>`).join(''):'<div class="empty">Nothing on this day</div>');
+}
+$('days').onclick=e=>{const d=e.target.closest('.d');if(d){sel=d.dataset.d;renderCal()}};
+$('prev').onclick=()=>{view.setMonth(view.getMonth()-1);go()};
+$('next').onclick=()=>{view.setMonth(view.getMonth()+1);go()};
+async function go(){try{$('err').innerHTML='';await loadMonth()}catch(e){$('err').innerHTML='<div class="err">'+esc(e.message)+'. Check your key in Settings.</div>'}}
+async function init(){
+  if(!ik){$('gear').click();return}
+  const t=new Date(),o=new Date();o.setDate(t.getDate()-30);
+  try{wellness=await api(`/wellness?oldest=${iso(o)}&newest=${iso(t)}`);wellness.sort((a,b)=>a.id<b.id?-1:1);renderWell()}catch(e){$('err').innerHTML='<div class="err">'+esc(e.message)+'. Check your key in Settings.</div>'}
+  await go();
+}
+function context(){
+  let c='Today is '+iso(new Date())+'.\nWellness (date, CTL, ATL, HRV, restingHR, sleep h, weight):\n';
+  c+=wellness.slice(-21).map(w=>[w.id,w.ctl!=null?w.ctl.toFixed(0):'-',w.atl!=null?w.atl.toFixed(0):'-',w.hrv??'-',w.restingHR??'-',w.sleepSecs?(w.sleepSecs/3600).toFixed(1):'-',w.weight??'-'].join(', ')).join('\n');
+  const all=[];for(const k in cache){for(const a of cache[k].a)all.push(['DONE',(a.start_date_local||'').slice(0,10),a.name,a.type,dur(a.moving_time),a.icu_training_load!=null?Math.round(a.icu_training_load)+' TSS':'']);
+    for(const a of cache[k].ev)all.push(['PLANNED',(a.start_date_local||'').slice(0,10),a.name,a.type,dur(a.moving_time),a.icu_training_load!=null?Math.round(a.icu_training_load)+' TSS':''])}
+  const seen={};const u=all.filter(r=>{const k=r.join('|');return seen[k]?0:seen[k]=1}).sort((a,b)=>a[1]<b[1]?-1:1);
+  return c+'\n\nWorkouts (status, date, name, type, duration, load):\n'+u.map(r=>r.join(', ')).join('\n');
+}
+function bubble(t,c){const d=document.createElement('div');d.className='b '+c;d.textContent=t;$('msgs').appendChild(d);d.scrollIntoView({block:'end',behavior:'smooth'});return d}
+async function send(){
+  const q=$('q').value.trim();if(!q)return;
+  if(!ck){$('gear').click();return}
+  $('q').value='';$('hint')&&$('hint').remove();bubble(q,'u');hist.push({role:'user',content:q});
+  const b=bubble('…','a');
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':ck,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:MODEL,max_tokens:1200,system:'You are a concise, practical endurance training coach. Use the athlete data below from Intervals.icu. Plain text, no markdown headers. Suggest specific workouts when asked.\n\n'+context(),messages:hist})});
+    const j=await r.json();if(!r.ok)throw new Error(j.error?.message||r.status);
+    const t=j.content.map(c=>c.text||'').join('');hist.push({role:'assistant',content:t});b.textContent=t;
+  }catch(e){hist.pop();b.textContent='Error: '+e.message;}
+  b.scrollIntoView({block:'end',behavior:'smooth'});
+}
+$('go').onclick=send;$('q').onkeydown=e=>{if(e.key==='Enter')send()};
+$('gear').onclick=()=>{$('ik').value=ik;$('ck').value=ck;$('dlg').showModal()};
+$('save').onclick=()=>{ik=$('ik').value.trim();ck=$('ck').value.trim();ls.s('ik',ik);ls.s('ck',ck);$('dlg').close();cache={};init()};
+$('clr').onclick=()=>{ls.d('ik');ls.d('ck');ik=ck='';$('ik').value=$('ck').value='';};
+init();
+</script>
+</body>
+</html>
