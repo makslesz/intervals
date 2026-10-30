@@ -73,7 +73,7 @@ dialog p{font-size:12px;color:var(--tx2)}
   <div class="days" id="days"></div>
 </div>
 <div class="card" id="detail" style="margin-top:10px"></div>
-<h2>Ask Claude</h2>
+<h2>Ask your coach</h2>
 <div id="msgs"><div class="empty" id="hint">Ask about your training, recovery or what to do next.</div></div>
 </main>
 <div id="bar"><div><input id="q" placeholder="Ask about your training" enterkeyhint="send" autocomplete="off"><button id="go" aria-label="Send">↑</button></div></div>
@@ -81,13 +81,13 @@ dialog p{font-size:12px;color:var(--tx2)}
 <dialog id="dlg">
   <h3>Settings</h3>
   <label>Intervals.icu API key</label><input id="ik" type="password" autocomplete="off">
-  <label>Claude API key</label><input id="ck" type="password" autocomplete="off">
-  <p>Keys are stored only in this browser on your device. Intervals.icu: Settings → Developer Settings. Claude: console.anthropic.com.</p>
+  <label>OpenAI API key</label><input id="ck" type="password" autocomplete="off">
+  <p>Keys are stored only in this browser on your device. Intervals.icu: Settings → Developer Settings. OpenAI: platform.openai.com/api-keys.</p>
   <div style="display:flex;justify-content:space-between"><button id="clr" style="color:var(--red)">Clear keys</button><button id="save"><b>Save</b></button></div>
 </dialog>
 
 <script>
-const MODEL='claude-sonnet-5-5';
+const MODEL='gpt-4o-mini'; // change to any OpenAI chat model you have access to
 const $=id=>document.getElementById(id);
 const ls={g:k=>{try{return localStorage.getItem(k)||''}catch(e){return ''}},s:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},d:k=>{try{localStorage.removeItem(k)}catch(e){}}};
 let ik=ls.g('ik'),ck=ls.g('ck'),wellness=[],cache={},view=new Date(),sel=iso(new Date()),hist=[];
@@ -159,10 +159,10 @@ async function send(){
   $('q').value='';$('hint')&&$('hint').remove();bubble(q,'u');hist.push({role:'user',content:q});
   const b=bubble('…','a');
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':ck,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:MODEL,max_tokens:1200,system:'You are a concise, practical endurance training coach. Use the athlete data below from Intervals.icu. Plain text, no markdown headers. Suggest specific workouts when asked.\n\n'+context(),messages:hist})});
+    const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'content-type':'application/json','authorization':'Bearer '+ck},
+      body:JSON.stringify({model:MODEL,max_completion_tokens:1200,messages:[{role:'system',content:'You are a concise, practical endurance training coach. Use the athlete data below from Intervals.icu. Plain text, no markdown headers. Suggest specific workouts when asked.\n\n'+context()},...hist]})});
     const j=await r.json();if(!r.ok)throw new Error(j.error?.message||r.status);
-    const t=j.content.map(c=>c.text||'').join('');hist.push({role:'assistant',content:t});b.textContent=t;
+    const t=j.choices[0].message.content||'';hist.push({role:'assistant',content:t});b.textContent=t;
   }catch(e){hist.pop();b.textContent='Error: '+e.message;}
   b.scrollIntoView({block:'end',behavior:'smooth'});
 }
