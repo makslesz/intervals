@@ -1,176 +1,244 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Training</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Training">
-<meta name="theme-color" content="#f2f2f7">
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Intervals Today</title>
 <style>
-:root{--bg:#f2f2f7;--card:#fff;--tx:#1c1c1e;--tx2:#8e8e93;--sep:#e5e5ea;--blue:#0a84ff;--green:#30d158;--red:#ff453a;--fill:#e9e9ee}
-@media (prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--tx:#fff;--tx2:#98989f;--sep:#38383a;--blue:#0a84ff;--fill:#2c2c2e}}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0}
-body{font:16px/1.35 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--tx);padding:env(safe-area-inset-top) 0 calc(84px + env(safe-area-inset-bottom))}
-main{max-width:640px;margin:0 auto;padding:0 16px}
-header{display:flex;align-items:center;justify-content:space-between;padding:18px 4px 10px}
-h1{font-size:32px;font-weight:700;letter-spacing:-.02em;margin:0}
-h2{font-size:20px;font-weight:600;margin:24px 4px 10px;letter-spacing:-.01em}
-button{font:inherit;color:var(--blue);background:none;border:0;padding:6px;cursor:pointer}
-.card{background:var(--card);border-radius:18px;padding:14px}
-.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.m{background:var(--card);border-radius:18px;padding:12px 12px 8px;min-height:92px}
-.m small{color:var(--tx2);font-size:12px;display:block}
-.m b{font-size:24px;font-weight:700;letter-spacing:-.02em}
-.m i{font-style:normal;font-size:12px;color:var(--tx2);margin-left:2px}
-.m svg{display:block;width:100%;height:22px;margin-top:4px}
-.cal-h{display:flex;align-items:center;justify-content:space-between;margin:0 0 8px}
-.cal-h strong{font-size:17px}
-.dow,.days{display:grid;grid-template-columns:repeat(7,1fr);text-align:center}
-.dow span{font-size:11px;color:var(--tx2);padding:4px 0}
-.d{height:50px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:5px;border-radius:12px;cursor:pointer;font-size:15px}
-.d.o{color:var(--tx2);opacity:.45}
-.d .n{width:28px;height:28px;line-height:28px;border-radius:50%}
-.d.t .n{background:var(--red);color:#fff;font-weight:600}
-.d.s{background:var(--fill)}
-.dots{display:flex;gap:3px;height:6px;margin-top:2px}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
-.dot.p{background:none;border:1.5px solid var(--blue)}
-.row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--sep)}
-.row:first-child{border-top:0}
-.row span{color:var(--tx2);font-size:14px;white-space:nowrap}
-.row em{font-style:normal;color:var(--blue);font-size:12px;display:block}
-.empty{color:var(--tx2);text-align:center;padding:10px}
-#msgs{display:flex;flex-direction:column;gap:8px}
-.b{max-width:85%;padding:9px 13px;border-radius:18px;white-space:pre-wrap;word-wrap:break-word}
-.b.u{align-self:flex-end;background:var(--blue);color:#fff}
-.b.a{align-self:flex-start;background:var(--card)}
-#bar{position:fixed;left:0;right:0;bottom:0;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--bg) 80%,transparent);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-top:1px solid var(--sep)}
-#bar div{max-width:640px;margin:0 auto;display:flex;gap:8px}
-#q{flex:1;font:inherit;font-size:16px;border:0;border-radius:20px;padding:10px 16px;background:var(--card);color:var(--tx);outline:none}
-#go{background:var(--blue);color:#fff;border-radius:50%;width:40px;height:40px;padding:0;font-size:18px}
-dialog{border:0;border-radius:20px;background:var(--card);color:var(--tx);width:min(92vw,420px);padding:20px}
-dialog::backdrop{background:rgba(0,0,0,.4)}
-dialog h3{margin:0 0 12px}
-dialog label{display:block;font-size:13px;color:var(--tx2);margin:12px 0 4px}
-dialog input{width:100%;font:inherit;font-size:16px;padding:10px;border-radius:10px;border:1px solid var(--sep);background:var(--bg);color:var(--tx)}
-dialog p{font-size:12px;color:var(--tx2)}
-.err{color:var(--red);text-align:center;padding:8px;font-size:14px}
-</style>
-</head>
-<body>
-<main>
-<header><h1>Training</h1><button id="gear" aria-label="Settings">Settings</button></header>
-<div id="err"></div>
-<div class="grid" id="well"></div>
-<h2>Calendar</h2>
-<div class="card">
-  <div class="cal-h"><button id="prev" aria-label="Previous month">‹</button><strong id="mt"></strong><button id="next" aria-label="Next month">›</button></div>
-  <div class="dow"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
-  <div class="days" id="days"></div>
-</div>
-<div class="card" id="detail" style="margin-top:10px"></div>
-<h2>Ask your coach</h2>
-<div id="msgs"><div class="empty" id="hint">Ask about your training, recovery or what to do next.</div></div>
-</main>
-<div id="bar"><div><input id="q" placeholder="Ask about your training" enterkeyhint="send" autocomplete="off"><button id="go" aria-label="Send">↑</button></div></div>
+:root{--ink:#161616;--mut:#77756e;--cream:#f4f2ec;--amber:#f2c46d;--green:#cfe8c4;--blue:#cfe0f5;--bl:#4a8fe0;--pk:#e0699b}
+*{box-sizing:border-box;margin:0}
+body{background:#262626;color:var(--ink);font:13px/1.4 ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;-webkit-tap-highlight-color:transparent}
+.app{max-width:440px;margin:0 auto;min-height:100dvh;background:#141414;padding:calc(env(safe-area-inset-top,0px) + 14px) 12px 100px}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--bl);outline-offset:2px}
+.panel{display:none}.panel.on{display:block}
+.card{border-radius:24px;padding:14px;margin-bottom:10px;overflow:hidden}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.row .card{margin:0 0 10px;min-height:190px}
+h1{font-size:25px;letter-spacing:-.04em}h2{font-size:16px;letter-spacing:-.02em}
+small{color:var(--mut);font-size:11px}
+.hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.badge{font-size:11px;padding:3px 9px;border-radius:99px;background:#e6e2d6}.badge.live{background:#bfe8b8}
+.top{background:var(--cream)}
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.chip{background:#fff;border-radius:14px;padding:7px 8px}.chip b{display:block;font-size:14px}
+.wk{display:flex;align-items:center;gap:2px;margin-bottom:8px}.wk>button{font-size:20px;padding:0 6px;color:var(--mut)}
+.strip{flex:1;display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.d{display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 0 4px;border-radius:14px}
+.d i{font-style:normal;font-size:10px;color:var(--mut)}.d b{font-size:14px}
+.d.tod b{color:var(--ora,#e8743b)}.d.sel{background:var(--ink);color:#fff}.d.sel i{color:#bbb}
+.d span{height:6px;display:flex;gap:2px}.d u{width:5px;height:5px;border-radius:50%;display:block}
+u.done{background:#3fae5a}u.plan{background:none;border:1.5px solid #e8743b}
+.it{padding:9px 2px;border-top:1px solid #dcd8cb;cursor:pointer}
+.r1{display:flex;align-items:center;gap:7px}.r1 b{flex:1;font-size:13px}.r1 em{font-style:normal;font-size:10px;color:var(--mut)}
+.dot{width:9px;height:9px;border-radius:50%}.dot.a{background:#3fae5a}.dot.e{border:2px solid #e8743b}
+.meta{font-size:11px;color:var(--mut);padding-left:16px}
+.det{margin:8px 0 2px 16px;padding:10px;background:#fff;border-radius:14px;font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stats b{display:block}
+.desc{margin-top:8px;white-space:pre-wrap;color:#444;max-height:150px;overflow:auto}
+.empty{color:var(--mut);padding:12px 2px;border-top:1px solid #dcd8cb}
+.amber{background:var(--amber)}.green{background:var(--green)}.blue{background:var(--blue)}
+.wg{display:grid;grid-template-columns:1fr 1fr;gap:10px 8px;margin-top:12px}
+.wg small{color:#5a4a1f;display:block}.wg b{font-size:19px;letter-spacing:-.03em}.wg i{font-style:normal;font-size:10px;color:#5a4a1f;margin-left:3px}
+.wo svg{width:100%;height:90px;margin:10px 0 6px;display:block}
+.wo .big{font-size:20px;letter-spacing:-.03em}
+.pill{display:inline-flex;background:#2f6fbe;border-radius:99px;padding:3px}
+.pill button{padding:4px 12px;border-radius:99px;font-size:12px;color:#fff}.pill button.on{background:#fff;color:#1b3f70}
+.fit svg{width:100%;height:96px;display:block;margin:10px 0 4px}
+.fit .ft{display:flex;justify-content:space-between;align-items:flex-end}
+.big2{font-size:34px;letter-spacing:-.05em;line-height:1}
+.lg{display:flex;gap:12px;font-size:11px}.lg u{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
+.chat{display:flex;flex-direction:column;height:calc(100dvh - 150px)}
+.chat .hd h1{color:#f4f2ec}
+.msgs{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:2px 0 10px}
+.m{max-width:85%;padding:10px 13px;border-radius:18px;white-space:pre-wrap}
+.m.b{background:var(--cream);align-self:flex-start;border-bottom-left-radius:6px}
+.m.u{background:var(--bl);color:#fff;align-self:flex-end;border-bottom-right-radius:6px}
+.note{background:#2c2a22;color:var(--amber);border-radius:14px;padding:9px 12px;font-size:12px;margin-bottom:10px}
+.sug{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.sug button{background:#2a2a2a;color:#ddd;padding:6px 11px;border-radius:99px;font-size:12px}
+.send{display:flex;gap:8px}
+.send input,.set input{flex:1;font:inherit;border:0;border-radius:99px;padding:12px 16px;background:var(--cream)}
+.send button{background:var(--amber);border-radius:99px;padding:0 18px;font-weight:700}
+.set{background:var(--cream);border-radius:24px;padding:16px;display:grid;gap:10px}
+.set label{display:grid;gap:4px}.set input{border-radius:14px;background:#fff;border:1px solid #dcd8cb}
+.set .btns{display:flex;gap:8px}.set .btns button{padding:11px 16px;border-radius:99px;background:var(--ink);color:#fff}
+.set .btns button.alt{background:#e6e2d6;color:var(--ink)}
+nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 14px);background:#0b0b0b;border-radius:99px;padding:6px;display:flex;gap:4px;box-shadow:0 0 0 1px #333}
+nav button{width:62px;height:42px;border-radius:99px;color:#999;display:grid;place-items:center}
+nav button.on{background:#fff;color:#111}
+</style></head><body>
+<div class="app">
+<section id="p0" class="panel on">
+ <div class="card top">
+  <div class="hd"><h1>Today</h1><span id="badge" class="badge">Demo</span></div>
+  <div class="chips" id="chips"></div>
+  <div class="wk"><button id="prev" aria-label="Previous week">‹</button><div class="strip" id="strip"></div><button id="next" aria-label="Next week">›</button></div>
+  <div id="list"></div>
+ </div>
+ <div class="row"><div class="card amber" id="well"></div><div class="card green wo" id="wo"></div></div>
+ <div class="card blue fit" id="fit"></div>
+</section>
 
-<dialog id="dlg">
-  <h3>Settings</h3>
-  <label>Intervals.icu API key</label><input id="ik" type="password" autocomplete="off">
-  <label>OpenAI API key</label><input id="ck" type="password" autocomplete="off">
-  <p>Keys are stored only in this browser on your device. Intervals.icu: Settings → Developer Settings. OpenAI: platform.openai.com/api-keys.</p>
-  <div style="display:flex;justify-content:space-between"><button id="clr" style="color:var(--red)">Clear keys</button><button id="save"><b>Save</b></button></div>
-</dialog>
+<section id="p1" class="panel"><div class="chat">
+ <div class="hd"><h1>Coach</h1><span class="badge">Not connected</span></div>
+ <div class="note">Chat is a preview. Planning workouts and reviewing past sessions will work once the assistant is connected.</div>
+ <div class="msgs" id="msgs"></div>
+ <div class="sug" id="sug"></div>
+ <div class="send"><input id="inp" placeholder="Ask about a workout or plan the week" autocomplete="off"><button id="go">Send</button></div>
+</div></section>
+
+<section id="p2" class="panel">
+ <div class="hd"><h1 style="color:#f4f2ec">Connect</h1></div>
+ <div class="set">
+  <label>Athlete ID<input id="aid" placeholder="i12345" autocomplete="off"></label>
+  <label>API key<input id="akey" type="password" placeholder="Intervals.icu → Settings → Developer" autocomplete="off"></label>
+  <div class="btns"><button id="save">Save and load</button><button class="alt" id="dm">Use demo data</button></div>
+  <small id="stat">No account connected. Showing demo data.</small>
+ </div>
+</section>
+
+<nav>
+ <button class="on" data-t="0" aria-label="Today"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></button>
+ <button data-t="1" aria-label="Chat"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg></button>
+ <button data-t="2" aria-label="Connect"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></button>
+</nav>
+</div>
 
 <script>
-const MODEL='gpt-4o-mini'; // change to any OpenAI chat model you have access to
-const $=id=>document.getElementById(id);
-const ls={g:k=>{try{return localStorage.getItem(k)||''}catch(e){return ''}},s:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},d:k=>{try{localStorage.removeItem(k)}catch(e){}}};
-let ik=ls.g('ik'),ck=ls.g('ck'),wellness=[],cache={},view=new Date(),sel=iso(new Date()),hist=[];
-view.setDate(1);
-function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
-function dur(s){if(!s)return'';const h=Math.floor(s/3600),m=Math.round(s%3600/60);return h?h+'h '+m+'m':m+'m'}
-function esc(t){return String(t).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
-async function api(p){const r=await fetch('https://intervals.icu/api/v1/athlete/0'+p,{headers:{Authorization:'Basic '+btoa('API_KEY:'+ik)}});if(!r.ok)throw new Error('Intervals.icu returned '+r.status);return r.json()}
-function spark(v,c){v=v.filter(x=>x!=null);if(v.length<2)return'';const mn=Math.min(...v),mx=Math.max(...v),r=mx-mn||1;const p=v.map((x,i)=>(i/(v.length-1)*100).toFixed(1)+','+(20-(x-mn)/r*18).toFixed(1)).join(' ');return`<svg viewBox="0 0 100 22" preserveAspectRatio="none"><polyline points="${p}" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`}
-function renderWell(){
-  const last=k=>{for(let i=wellness.length-1;i>=0;i--)if(wellness[i][k]!=null)return wellness[i][k]};
-  const ser=k=>wellness.map(w=>w[k]);
-  const ctl=last('ctl'),atl=last('atl'),form=ctl!=null&&atl!=null?Math.round(ctl-atl):null;
-  const items=[
-    ['HRV',last('hrv')!=null?Math.round(last('hrv')):'–','ms',ser('hrv'),'#30d158'],
-    ['Resting HR',last('restingHR')??'–','bpm',ser('restingHR'),'#ff453a'],
-    ['Sleep',last('sleepSecs')?dur(last('sleepSecs')):'–','',ser('sleepSecs'),'#bf5af2'],
-    ['Fitness',ctl!=null?Math.round(ctl):'–','CTL',ser('ctl'),'#0a84ff'],
-    ['Fatigue',atl!=null?Math.round(atl):'–','ATL',ser('atl'),'#ff9f0a'],
-    ['Form',form??'–','TSB',wellness.map(w=>w.ctl!=null&&w.atl!=null?w.ctl-w.atl:null),'#64d2ff']];
-  $('well').innerHTML=items.map(i=>`<div class="m"><small>${i[0]}</small><b>${i[1]}</b><i>${i[2]}</i>${spark(i[3],i[4])}</div>`).join('');
+const $=s=>document.querySelector(s);
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const iso=d=>{const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4);return z.toISOString().slice(0,10)};
+const addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fd=s=>{s=Math.round(s||0);const h=Math.floor(s/3600),m=Math.round(s%3600/60);return h?`${h}h${String(m).padStart(2,'0')}`:`${m}m`};
+const day=x=>(x.start_date_local||x.id||'').slice(0,10);
+const S={ev:[],act:[],well:[],sel:iso(new Date()),wk:0,range:42,open:null};
+
+/* ---------- API ---------- */
+async function api(path,q){
+  const r=await fetch(`https://intervals.icu/api/v1/athlete/${encodeURIComponent(store.get('id'))}/${path}?`+new URLSearchParams(q),
+    {headers:{Authorization:'Basic '+btoa('API_KEY:'+store.get('key'))}});
+  if(!r.ok)throw new Error('HTTP '+r.status);return r.json();
 }
-function grid(){const f=new Date(view),o=(f.getDay()+6)%7;const s=new Date(f);s.setDate(1-o);const e=new Date(s);e.setDate(s.getDate()+41);return[s,e]}
-async function loadMonth(){
-  const [s,e]=grid(),key=iso(view);
-  if(!cache[key]){const q=`?oldest=${iso(s)}&newest=${iso(e)}`;
-    const [a,ev]=await Promise.all([api('/activities'+q),api('/events'+q+'&category=WORKOUT')]);
-    cache[key]={a,ev};}
-  renderCal();
-}
-function items(date){
-  const out=[];
-  for(const k in cache){for(const a of cache[k].a)if((a.start_date_local||'').slice(0,10)===date&&!out.some(o=>o.id==='a'+a.id))out.push({id:'a'+a.id,done:1,name:a.name,type:a.type,t:a.moving_time,dist:a.distance,load:a.icu_training_load});
-    for(const a of cache[k].ev)if((a.start_date_local||'').slice(0,10)===date&&!out.some(o=>o.id==='e'+a.id))out.push({id:'e'+a.id,done:0,name:a.name,type:a.type,t:a.moving_time,load:a.icu_training_load});}
-  return out;
-}
-function renderCal(){
-  $('mt').textContent=view.toLocaleDateString(undefined,{month:'long',year:'numeric'});
-  const [s]=grid(),today=iso(new Date());let h='';
-  for(let i=0;i<42;i++){const d=new Date(s);d.setDate(s.getDate()+i);const k=iso(d),it=items(k);
-    h+=`<div class="d${d.getMonth()!==view.getMonth()?' o':''}${k===today?' t':''}${k===sel?' s':''}" data-d="${k}"><span class="n">${d.getDate()}</span><div class="dots">${it.slice(0,3).map(x=>`<i class="dot${x.done?'':' p'}"></i>`).join('')}</div></div>`;}
-  $('days').innerHTML=h;
-  const it=items(sel),dt=new Date(sel+'T12:00');
-  $('detail').innerHTML=`<div style="font-weight:600;margin-bottom:4px">${dt.toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'})}</div>`+
-    (it.length?it.map(x=>`<div class="row"><div>${esc(x.name||x.type||'Workout')}<em>${x.done?'':'Planned'}</em></div><span>${[x.type,dur(x.t),x.dist?(x.dist/1000).toFixed(1)+' km':'',x.load?Math.round(x.load)+' TSS':''].filter(Boolean).join(' · ')}</span></div>`).join(''):'<div class="empty">Nothing on this day</div>');
-}
-$('days').onclick=e=>{const d=e.target.closest('.d');if(d){sel=d.dataset.d;renderCal()}};
-$('prev').onclick=()=>{view.setMonth(view.getMonth()-1);go()};
-$('next').onclick=()=>{view.setMonth(view.getMonth()+1);go()};
-async function go(){try{$('err').innerHTML='';await loadMonth()}catch(e){$('err').innerHTML='<div class="err">'+esc(e.message)+'. Check your key in Settings.</div>'}}
-async function init(){
-  if(!ik){$('gear').click();return}
-  const t=new Date(),o=new Date();o.setDate(t.getDate()-30);
-  try{wellness=await api(`/wellness?oldest=${iso(o)}&newest=${iso(t)}`);wellness.sort((a,b)=>a.id<b.id?-1:1);renderWell()}catch(e){$('err').innerHTML='<div class="err">'+esc(e.message)+'. Check your key in Settings.</div>'}
-  await go();
-}
-function context(){
-  let c='Today is '+iso(new Date())+'.\nWellness (date, CTL, ATL, HRV, restingHR, sleep h, weight):\n';
-  c+=wellness.slice(-21).map(w=>[w.id,w.ctl!=null?w.ctl.toFixed(0):'-',w.atl!=null?w.atl.toFixed(0):'-',w.hrv??'-',w.restingHR??'-',w.sleepSecs?(w.sleepSecs/3600).toFixed(1):'-',w.weight??'-'].join(', ')).join('\n');
-  const all=[];for(const k in cache){for(const a of cache[k].a)all.push(['DONE',(a.start_date_local||'').slice(0,10),a.name,a.type,dur(a.moving_time),a.icu_training_load!=null?Math.round(a.icu_training_load)+' TSS':'']);
-    for(const a of cache[k].ev)all.push(['PLANNED',(a.start_date_local||'').slice(0,10),a.name,a.type,dur(a.moving_time),a.icu_training_load!=null?Math.round(a.icu_training_load)+' TSS':''])}
-  const seen={};const u=all.filter(r=>{const k=r.join('|');return seen[k]?0:seen[k]=1}).sort((a,b)=>a[1]<b[1]?-1:1);
-  return c+'\n\nWorkouts (status, date, name, type, duration, load):\n'+u.map(r=>r.join(', ')).join('\n');
-}
-function bubble(t,c){const d=document.createElement('div');d.className='b '+c;d.textContent=t;$('msgs').appendChild(d);d.scrollIntoView({block:'end',behavior:'smooth'});return d}
-async function send(){
-  const q=$('q').value.trim();if(!q)return;
-  if(!ck){$('gear').click();return}
-  $('q').value='';$('hint')&&$('hint').remove();bubble(q,'u');hist.push({role:'user',content:q});
-  const b=bubble('…','a');
+async function load(){
+  const t=new Date(),o=iso(addD(t,-90)),n=iso(t),f=iso(addD(t,28));
+  const live=store.get('id')&&store.get('key')&&store.get('demo')!=='1';
   try{
-    const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'content-type':'application/json','authorization':'Bearer '+ck},
-      body:JSON.stringify({model:MODEL,max_completion_tokens:1200,messages:[{role:'system',content:'You are a concise, practical endurance training coach. Use the athlete data below from Intervals.icu. Plain text, no markdown headers. Suggest specific workouts when asked.\n\n'+context()},...hist]})});
-    const j=await r.json();if(!r.ok)throw new Error(j.error?.message||r.status);
-    const t=j.choices[0].message.content||'';hist.push({role:'assistant',content:t});b.textContent=t;
-  }catch(e){hist.pop();b.textContent='Error: '+e.message;}
-  b.scrollIntoView({block:'end',behavior:'smooth'});
+    if(!live)throw new Error('demo');
+    [S.ev,S.act,S.well]=await Promise.all([api('events',{oldest:o,newest:f}),api('activities',{oldest:o,newest:n}),api('wellness',{oldest:o,newest:n})]);
+    badge(true);$('#stat').textContent='Connected. Data loaded '+new Date().toLocaleTimeString()+'.';
+  }catch(e){
+    Object.assign(S,demo());badge(false);
+    if(live)$('#stat').textContent='Could not load ('+e.message+'). Check ID and key, or CORS. Showing demo data.';
+  }
+  renderAll();
 }
-$('go').onclick=send;$('q').onkeydown=e=>{if(e.key==='Enter')send()};
-$('gear').onclick=()=>{$('ik').value=ik;$('ck').value=ck;$('dlg').showModal()};
-$('save').onclick=()=>{ik=$('ik').value.trim();ck=$('ck').value.trim();ls.s('ik',ik);ls.s('ck',ck);$('dlg').close();cache={};init()};
-$('clr').onclick=()=>{ls.d('ik');ls.d('ck');ik=ck='';$('ik').value=$('ck').value='';};
-init();
-</script>
-</body>
-</html>
+const badge=l=>{const b=$('#badge');b.textContent=l?'Live':'Demo';b.className='badge'+(l?' live':'')};
+
+/* ---------- Demo data ---------- */
+function demo(){
+  const t=new Date(),ev=[],act=[],well=[],r=i=>Math.abs(Math.sin(i*12.9898)*43758.5453)%1;let c=48,a=52;
+  for(let i=-90;i<=14;i++){
+    const d=addD(t,i),ds=iso(d),load=r(i)<.28?0:Math.round(30+r(i+1)*90);
+    if(i<=0){
+      c+=(load-c)/42;a+=(load-a)/7;
+      well.push({id:ds,ctl:c,atl:a,hrv:52+r(i+2)*24,restingHR:49+Math.round(r(i+3)*8),sleepSecs:(6+r(i+4)*2.5)*3600,weight:71.6+r(i+5)*.9,readiness:60+Math.round(r(i+6)*35)});
+    }
+    if(i<0&&load)act.push({id:'d'+i,name:r(i+7)<.5?'Endurance ride':'Tempo run',type:'Ride',start_date_local:ds+'T07:00:00',moving_time:load*60,icu_training_load:load,distance:load*430,icu_average_watts:140+Math.round(r(i+8)*80),average_heartrate:128+Math.round(r(i+9)*25),total_elevation_gain:Math.round(load*4)});
+    if(i>=0&&(i===0||load))ev.push({id:'e'+i,category:'WORKOUT',name:i===0?'Sweet spot 3x10':'Endurance '+load+'m',start_date_local:ds+'T00:00:00',moving_time:i===0?4500:load*60,icu_training_load:i===0?78:Math.round(load*.7),
+      description:i===0?'Warmup\n- 15m 55%\n\nMain set\n3x\n- 10m 90%\n- 5m 55%\n\nCooldown\n- 10m 50%':'- '+load+'m 65%'});
+  }
+  return {ev,act,well};
+}
+
+/* ---------- Workout steps ---------- */
+function steps(e){
+  const f=s=>{const o=[];for(const x of s||[]){if(x.steps)for(let k=0;k<(x.reps||1);k++)o.push(...f(x.steps));else o.push({d:x.duration||0,p:x.power?.value??x.power?.end??x.hr?.value??60})}return o};
+  if(e.workout_doc?.steps?.length){const o=f(e.workout_doc.steps);if(o.length)return o}
+  const o=[];let g=null;const flush=()=>{if(g){for(let k=0;k<g.n;k++)o.push(...g.s);g=null}};
+  for(const l of (e.description||'').split('\n')){
+    if(!l.trim()){flush();continue}
+    const m=l.match(/^\s*-?\s*(\d+)x\s*$/);if(m){flush();g={n:+m[1],s:[]};continue}
+    const t=l.match(/(\d+(?:\.\d+)?)(h|m|s)\b.*?(\d+)%/);if(!t)continue;
+    const st={d:+t[1]*{h:3600,m:60,s:1}[t[2]],p:+t[3]};
+    if(g)g.s.push(st);else o.push(st);
+  }
+  flush();return o;
+}
+const zc=p=>p<56?'#9fb4c7':p<76?'#5b9bd5':p<91?'#58b368':p<106?'#f0b43c':p<121?'#e8743b':'#d9434a';
+
+/* ---------- Renderers ---------- */
+function renderCal(){
+  const t=new Date(),mon=addD(t,-((t.getDay()+6)%7)+S.wk*7),days=[...Array(7)].map((_,i)=>addD(mon,i)),ids=days.map(iso);
+  $('#strip').innerHTML=days.map((d,i)=>{const k=ids[i],
+    pl=S.ev.some(e=>day(e)===k&&e.category==='WORKOUT'&&!e.paired_activity_id),dn=S.act.some(a=>day(a)===k);
+    return `<button class="d ${k===S.sel?'sel':''} ${k===iso(t)?'tod':''}" data-d="${k}"><i>${'MTWTFSS'[i]}</i><b>${d.getDate()}</b><span>${dn?'<u class="done"></u>':''}${pl?'<u class="plan"></u>':''}</span></button>`}).join('');
+  const wa=S.act.filter(a=>ids.includes(day(a)));
+  const tm=wa.reduce((s,a)=>s+(a.moving_time||0),0),ds=wa.reduce((s,a)=>s+(a.distance||0),0),ld=wa.reduce((s,a)=>s+(a.icu_training_load||0),0);
+  $('#chips').innerHTML=[['Time',fd(tm)],['Dist',Math.round(ds/1000)+'km'],['Load',Math.round(ld)],['Sessions',wa.length]].map(([k,v])=>`<div class="chip"><small>${k}</small><b>${v}</b></div>`).join('');
+  const items=[
+    ...S.act.filter(a=>day(a)===S.sel).map(x=>({k:'a',id:'a'+x.id,x})),
+    ...S.ev.filter(e=>day(e)===S.sel&&!e.paired_activity_id&&(e.category==='WORKOUT'||/^RACE/.test(e.category||''))).map(x=>({k:'e',id:'e'+x.id,x}))];
+  $('#list').innerHTML=items.length?items.map(({k,id,x})=>{
+    const tm=x.moving_time||x.workout_doc?.duration||0,ld=x.icu_training_load,open=S.open===id;
+    const st=k==='a'?[['Time',fd(tm)],['Distance',x.distance?(x.distance/1000).toFixed(1)+' km':null],['Load',ld],['Avg power',x.icu_average_watts?x.icu_average_watts+' W':null],['Avg HR',x.average_heartrate?Math.round(x.average_heartrate)+' bpm':null],['Climb',x.total_elevation_gain?Math.round(x.total_elevation_gain)+' m':null]]
+      :[['Planned time',fd(tm)],['Load',ld],['Type',x.type]];
+    return `<div class="it" data-id="${id}"><div class="r1"><span class="dot ${k}"></span><b>${esc(x.name)}</b><em>${k==='a'?'done':'planned'}</em></div>
+      <div class="meta">${fd(tm)}${ld?' · '+Math.round(ld)+' load':''}${k==='a'&&x.distance?' · '+(x.distance/1000).toFixed(1)+' km':''}</div>
+      ${open?`<div class="det"><div class="stats">${st.filter(s=>s[1]).map(s=>`<div><small>${s[0]}</small><b>${esc(s[1])}</b></div>`).join('')}</div>${x.description?`<div class="desc">${esc(x.description.slice(0,700))}</div>`:''}</div>`:''}</div>`}).join('')
+    :'<div class="empty">Nothing planned or recorded for this day.</div>';
+}
+function renderWell(){
+  const w=S.well.slice().sort((a,b)=>a.id<b.id?-1:1),last=[...w].reverse().find(r=>r.hrv||r.restingHR)||{};
+  const defs=[['HRV','hrv','ms',v=>Math.round(v)],['RHR','restingHR','bpm',v=>Math.round(v)],['Sleep','sleepSecs','h',v=>(v/3600).toFixed(1)],['Weight','weight','kg',v=>v.toFixed(1)],['Readiness','readiness','',v=>Math.round(v)],['SpO₂','spO2','%',v=>Math.round(v)]];
+  const tiles=defs.filter(d=>last[d[1]]!=null).slice(0,4).map(([n,key,u,f])=>{
+    const prev=w.filter(r=>r.id<last.id&&r[key]!=null).slice(-7),avg=prev.length?prev.reduce((s,r)=>s+r[key],0)/prev.length:null;
+    const dl=avg==null?'':(last[key]-avg>=0?'+':'−')+Math.abs(+f(last[key]-avg)).toString();
+    return `<div><small>${n}</small><b>${f(last[key])}</b><i>${u}</i>${dl?`<br><small>${dl} vs 7d</small>`:''}</div>`}).join('');
+  $('#well').innerHTML=`<h2>Wellness</h2><small style="color:#5a4a1f">${last.id||'No data'}</small><div class="wg">${tiles||'<small>No wellness data yet.</small>'}</div>`;
+}
+function renderWo(){
+  const k=iso(new Date()),e=S.ev.find(e=>day(e)===k&&e.category==='WORKOUT');
+  if(!e){const nx=S.ev.filter(e=>day(e)>k&&e.category==='WORKOUT').sort((a,b)=>day(a)<day(b)?-1:1)[0];
+    $('#wo').innerHTML=`<h2>Rest day</h2><small>No workout planned today</small><div style="margin-top:50px">${nx?`<small>Next up</small><br><b>${esc(nx.name)}</b><br><small>${day(nx)}</small>`:''}</div>`;return}
+  const st=steps(e),tot=st.reduce((s,x)=>s+x.d,0)||1,mx=Math.max(...st.map(x=>x.p),100);let x0=0;
+  const bars=st.map(s=>{const w=s.d/tot*200,h=Math.max(6,s.p/mx*84),r=`<rect x="${x0.toFixed(1)}" y="${90-h}" width="${Math.max(w-.8,.6).toFixed(1)}" height="${h}" rx="1.5" fill="${zc(s.p)}"/>`;x0+=w;return r}).join('');
+  $('#wo').innerHTML=`<h2>Workout</h2><small style="color:#3e5a37">${esc(e.name)}</small>
+    ${st.length?`<svg viewBox="0 0 200 90" preserveAspectRatio="none" role="img" aria-label="Planned intervals">${bars}</svg>`:'<small style="display:block;margin:30px 0">No structured steps.</small>'}
+    <div class="big">${fd(e.moving_time||tot)}</div><small style="color:#3e5a37">${e.icu_training_load?Math.round(e.icu_training_load)+' planned load':''}</small>`;
+}
+function renderFit(){
+  const w=S.well.filter(r=>r.ctl!=null).sort((a,b)=>a.id<b.id?-1:1).slice(-S.range);
+  if(w.length<2){$('#fit').innerHTML='<h2>Fitness</h2><small>No fitness data yet.</small>';return}
+  const all=w.flatMap(r=>[r.ctl,r.atl]),mn=Math.min(...all),mx=Math.max(...all),W=300,H=90;
+  const p=k=>w.map((r,i)=>`${i?'L':'M'}${(i/(w.length-1)*W).toFixed(1)},${(H-6-(r[k]-mn)/(mx-mn||1)*(H-14)).toFixed(1)}`).join('');
+  const l=w[w.length-1],form=l.ctl-l.atl;
+  $('#fit').innerHTML=`<div class="hd" style="margin:0"><h2>Fitness</h2><div class="pill"><button data-r="42" class="${S.range===42?'on':''}">6W</button><button data-r="90" class="${S.range===90?'on':''}">3M</button></div></div>
+   <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Fitness and fatigue"><path d="${p('ctl')}" fill="none" stroke="var(--bl)" stroke-width="2.5" vector-effect="non-scaling-stroke"/><path d="${p('atl')}" fill="none" stroke="var(--pk)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>
+   <div class="ft"><div class="lg"><span><u style="background:var(--bl)"></u>Fitness ${Math.round(l.ctl)}</span><span><u style="background:var(--pk)"></u>Fatigue ${Math.round(l.atl)}</span></div>
+   <div style="text-align:right"><div class="big2">${form>0?'+':''}${Math.round(form)}</div><small>Form</small></div></div>`;
+}
+const renderAll=()=>{renderCal();renderWell();renderWo();renderFit()};
+
+/* ---------- Events ---------- */
+$('#strip').onclick=e=>{const b=e.target.closest('.d');if(b){S.sel=b.dataset.d;S.open=null;renderCal()}};
+$('#list').onclick=e=>{const i=e.target.closest('.it');if(i){S.open=S.open===i.dataset.id?null:i.dataset.id;renderCal()}};
+$('#prev').onclick=()=>{S.wk--;renderCal()};$('#next').onclick=()=>{S.wk++;renderCal()};
+$('#fit').onclick=e=>{const b=e.target.closest('[data-r]');if(b){S.range=+b.dataset.r;renderFit()}};
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('.panel').forEach((p,i)=>p.classList.toggle('on',i===+b.dataset.t))});
+$('#save').onclick=()=>{store.set('id',$('#aid').value.trim());store.set('key',$('#akey').value.trim());store.set('demo','0');$('#stat').textContent='Loading…';load()};
+$('#dm').onclick=()=>{store.set('demo','1');$('#stat').textContent='Showing demo data.';load()};
+$('#aid').value=store.get('id')||'';$('#akey').value=store.get('key')||'';
+
+/* ---------- Chat (placeholder) ---------- */
+const msgs=[{r:'b',t:'Hi! Soon you will be able to ask me to plan your next week or break down a past workout.'}];
+// TODO: replace with a call to your backend / MCP-connected assistant.
+async function askAssistant(text){return 'Chat is not connected yet, so I cannot answer that. This is where the intervals.icu MCP integration will plug in.'}
+function renderChat(){const m=$('#msgs');m.innerHTML=msgs.map(x=>`<div class="m ${x.r}">${esc(x.t)}</div>`).join('');m.scrollTop=m.scrollHeight}
+async function send(t){t=(t??$('#inp').value).trim();if(!t)return;$('#inp').value='';msgs.push({r:'u',t});renderChat();
+  const a=await askAssistant(t);setTimeout(()=>{msgs.push({r:'b',t:a});renderChat()},350)}
+$('#go').onclick=()=>send();$('#inp').onkeydown=e=>{if(e.key==='Enter')send()};
+$('#sug').innerHTML=['Plan my next week','How was my last long ride?','Am I overreaching?'].map(s=>`<button>${s}</button>`).join('');
+$('#sug').onclick=e=>{if(e.target.tagName==='BUTTON')send(e.target.textContent)};
+renderChat();load();
+</script></body></html>
