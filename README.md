@@ -1,3 +1,3 @@
-# intervals
+# Training Calendar
 
-PWA for Intervals.icu
+Static page. `index.html` reads `data.json` (workouts + form series). To update, replace `data.json` and commit.
